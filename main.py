@@ -3,7 +3,6 @@ from typing import List, Optional
 from pydantic import BaseModel
 import requests
 from fastapi.middleware.cors import CORSMiddleware
-import requests
 import json
 import io
 import logging
