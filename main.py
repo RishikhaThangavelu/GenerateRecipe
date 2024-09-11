@@ -2,11 +2,51 @@ from fastapi import FastAPI, HTTPException
 from typing import List, Optional
 from pydantic import BaseModel
 import requests
+from fastapi.middleware.cors import CORSMiddleware
+import requests
+import json
+import io
+import logging
+# new package for cron task
+import aiocron
+import aiohttp
+from datetime import datetime, time
 
 API_KEY = '77268583b575469e898efe16e4e81960'
 BASE_URL = 'https://api.spoonacular.com'
 
 app = FastAPI()
+
+#Your free instance will spin down with inactivity, which can delay requests by 50 seconds or more.
+#so we self ping between the active hours to avoid the delay. 
+''' 
+async def is_active_hours():
+    now = datetime.now().time()
+    return time(9,0) <= now <= time(18,0) # assume active time between 9:00 and 18:00
+'''
+@aiocron.crontab('*/10 * * * *')
+async def self_ping():
+    async with aiohttp.ClientSession() as session:
+        async with session.get('https://recieptapi.onrender.com/health') as response:
+            print(f"Health check response: {response.status}")
+   
+@app.on_event("startup")
+async def startup_event():
+    self_ping.start()
+
+
+# set log
+# 设置日志
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # Define Pydantic models
 class NutritionalInfo(BaseModel):
