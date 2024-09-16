@@ -134,5 +134,5 @@ async def get_recipes(request: RecipeSearchRequest):
 
 @app.get("/health")
 async def health_check():
-    return ("status": "healthy")
+    return {"status": "healthy"}
 
