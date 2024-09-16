@@ -26,7 +26,7 @@ async def is_active_hours():
 @aiocron.crontab('*/10 * * * *')
 async def self_ping():
     async with aiohttp.ClientSession() as session:
-        async with session.get('https://recieptapi.onrender.com/health') as response:
+        async with session.get('https://generaterecipe.onrender.com/health') as response:
             print(f"Health check response: {response.status}")
    
 @app.on_event("startup")
@@ -81,6 +81,7 @@ def search_recipes_by_ingredients(ingredients: List[str], number_of_recipes: int
     else:
         raise HTTPException(status_code=response.status_code, detail="Error fetching recipes")
 
+
 # Function to get detailed recipe information including nutritional info
 def get_recipe_details(recipe_id: int):
     recipe_url = f"{BASE_URL}/recipes/{recipe_id}/information"
@@ -130,3 +131,8 @@ async def get_recipes(request: RecipeSearchRequest):
         return detailed_recipes
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/health")
+async def health_check():
+    return ("status": "healthy")
+
