@@ -130,6 +130,7 @@ async def get_recipes(request: RecipeSearchRequest):
         
         return detailed_recipes
     except Exception as e:
+        logger.error(f"Error processing request: {e}", exc_info=True) 
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/health")
